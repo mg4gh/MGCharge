@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="headStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">8dp</item>
+
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="rbStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">1dp</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="valueStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:padding">3dp</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:enabled">false</item>
+    </style>
+
+    <style name="MyTooltip" parent="Widget.MaterialComponents.Tooltip">
+        <item name="backgroundTint">@color/lightgray</item>
+        <item name="android:textAppearance">@style/MyTooltip.TextAppearance</item>
+    </style>
+
+    <style name="MyTooltip.TextAppearance" parent="@style/TextAppearance.MaterialComponents.Tooltip">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+</resources>

@@ -1,0 +1,11 @@
+http://<hostname>/reboot
+  {"ok":true}
+http://<hostname>/status
+  {"wifi_sta":{"connected":true,"ssid":"MeinWLAN","ip":"192.168.178.201","rssi":-70},"cloud":{"enabled":false,"connected":false},"mqtt":{"connected":false},"time":"","serial":1,"has_update":false,"mac":"E868E76EE3C6","relays":[{"ison":true,"has_timer":false,"overpower":false}],"meters":[{"power":1.74,"is_valid":true,"timestamp":1638988960,"counters":[0.000, 0.000, 0.000],"total":0}],"temperature":34.95,"overtemperature":false,"update":{"status":"unknown","has_update":false,"new_version":"","old_version":"20190516-073020/master@ea1b23db"},"ram_total":50832,"ram_free":40592,"fs_size":233681,"fs_free":171433,"uptime":29}
+http://<hostname>/relay/0?turn=on
+http://<hostname>/relay/0?turn=off
+  {"ison":false,"has_timer":false,"overpower":false}
+http://<hostname>/
+http://<hostname>/
+http://<hostname>/
+
