@@ -17,7 +17,7 @@
         android:textSize="20sp"
         />
     
-    <mg.charge.MGRangeSlider
+    <mg.charge.view.MGRangeSlider
         android:id="@+id/slide"
         app:labelStyle="@style/MyTooltip"
         app:values="@array/rangeSliderValues"

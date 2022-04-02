@@ -1,4 +1,4 @@
-package mg.charge;
+package mg.charge.model;
 
 import android.util.Log;
 
@@ -11,6 +11,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.UUID;
+
+import mg.charge.MGChargeApplication;
+import mg.charge.NameUtil;
 
 public class Device {
 

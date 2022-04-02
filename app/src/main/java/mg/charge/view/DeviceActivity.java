@@ -1,4 +1,4 @@
-package mg.charge;
+package mg.charge.view;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,15 +14,26 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+
+import mg.charge.MGChargeApplication;
+import mg.charge.NameUtil;
+import mg.charge.R;
+import mg.charge.model.Device;
+
 public class DeviceActivity extends AppCompatActivity {
 
     MGChargeApplication mgChargeApplication;
+    ArrayList<Device> devices = null;
     Device editDevice = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mgChargeApplication = (MGChargeApplication)getApplication();
         setContentView(R.layout.activity_devices);
+
+        devices = mgChargeApplication.getDevices();
         if (getSupportActionBar() != null){
             getSupportActionBar().setTitle("Devices");
         }
@@ -31,16 +42,15 @@ public class DeviceActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mgChargeApplication = (MGChargeApplication)getApplication();
 
         ListView listView = findViewById(R.id.devices_list);
-        ArrayAdapter<Device> listAdapter = new ArrayAdapter<>(this, R.layout.text, mgChargeApplication.devices);
+        ArrayAdapter<Device> listAdapter = new ArrayAdapter<>(this, R.layout.text, devices);
         listView.setAdapter(listAdapter);
 
         listView.setOnItemClickListener((adapterView, view, i, l) -> {
-            mgChargeApplication.setSelectedDevice( mgChargeApplication.devices.get(i) );
-            Log.i(MGChargeApplication.TAG, NameUtil.context()+" idx="+i+" selectedDevice="+ mgChargeApplication.selectedDevice);
-            startEditDevice(mgChargeApplication.selectedDevice);
+            mgChargeApplication.setSelectedDevice( devices.get(i) );
+            Log.i(MGChargeApplication.TAG, NameUtil.context()+" idx="+i+" selectedDevice="+ mgChargeApplication.getSelectedDevice());
+            startEditDevice(mgChargeApplication.getSelectedDevice());
         });
 
 
@@ -50,20 +60,20 @@ public class DeviceActivity extends AppCompatActivity {
 
         TextView deleteDevice = findViewById(R.id.delete_device);
         deleteDevice.setOnClickListener(view -> {
-            int idx = mgChargeApplication.devices.indexOf(editDevice);
+            int idx = devices.indexOf(editDevice);
             if (idx >= 0){
                 new AlertDialog.Builder(DeviceActivity.this)
                         .setMessage("Delete device \n      "+editDevice)
                         .setCancelable(false)
                         .setPositiveButton("Yes", (dialog, id) -> {
-                            mgChargeApplication.devices.remove(idx);
+                            devices.remove(idx);
                             listAdapter.notifyDataSetChanged();
                             mgChargeApplication.removeDevice(editDevice);
-                            if (mgChargeApplication.devices.size() == 0){
+                            if (devices.size() == 0){
                                 startEditDevice(new Device());
                             } else {
-                                mgChargeApplication.setSelectedDevice( mgChargeApplication.devices.get(Math.max(0,idx-1)));
-                                startEditDevice(mgChargeApplication.selectedDevice);
+                                mgChargeApplication.setSelectedDevice( devices.get(Math.max(0,idx-1)));
+                                startEditDevice(mgChargeApplication.getSelectedDevice());
                             }
                         })
                         .setNegativeButton("No", null)
@@ -84,9 +94,16 @@ public class DeviceActivity extends AppCompatActivity {
             return false;
         });
 
-        if (mgChargeApplication.selectedDevice != null){
-            startEditDevice(mgChargeApplication.selectedDevice);
+        if (mgChargeApplication.getSelectedDevice() != null){
+            startEditDevice(mgChargeApplication.getSelectedDevice());
         }
+        mgChargeApplication.actvityCountUpdate(true);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mgChargeApplication.actvityCountUpdate(false);
     }
 
     public void startEditDevice(Device editDevice){
@@ -103,8 +120,8 @@ public class DeviceActivity extends AppCompatActivity {
         editDevice.setIp(((EditText)findViewById(R.id.editIpAddress)).getText().toString() );
         editDevice.setUsername(((EditText)findViewById(R.id.editUsername)).getText().toString() );
         editDevice.setPassword(((EditText)findViewById(R.id.editPassword)).getText().toString() );
-        if (!mgChargeApplication.devices.contains(editDevice)){
-            mgChargeApplication.devices.add(editDevice);
+        if (!devices.contains(editDevice)){
+            devices.add(editDevice);
         }
         listAdapter.notifyDataSetChanged();
         mgChargeApplication.saveDevice(editDevice);

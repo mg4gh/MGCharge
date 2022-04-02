@@ -1,4 +1,4 @@
-package mg.charge;
+package mg.charge.view;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import mg.charge.R;
 
 public class BatteryTextView extends androidx.appcompat.widget.AppCompatTextView {
 

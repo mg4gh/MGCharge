@@ -1,4 +1,4 @@
-package mg.charge;
+package mg.charge.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,10 +11,11 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.slider.RangeSlider;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+
+import mg.charge.MGChargeApplication;
+import mg.charge.NameUtil;
 
 public class MGRangeSlider extends RangeSlider {
 

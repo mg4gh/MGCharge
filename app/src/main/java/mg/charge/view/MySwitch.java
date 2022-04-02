@@ -1,4 +1,4 @@
-package mg.charge;
+package mg.charge.view;
 
 import android.content.Context;
 import android.util.AttributeSet;

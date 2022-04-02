@@ -1,10 +1,12 @@
-package mg.charge;
+package mg.charge.view;
 
 import android.app.Dialog;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
+
+import mg.charge.R;
 
 public class BatteryLevelDialog extends Dialog implements android.view.View.OnClickListener {
 

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MGChargeActivity"
+    tools:context=".view.MGChargeActivity"
     android:orientation="vertical">
 
     <TextView
@@ -79,7 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
             </CheckBox>
-            <mg.charge.BatteryTextView
+            <mg.charge.view.BatteryTextView
                 android:id="@+id/onBattery"
                 style="@style/valueStyle" />
             <TextView
@@ -138,7 +138,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
             </CheckBox>
-            <mg.charge.BatteryTextView
+            <mg.charge.view.BatteryTextView
                 android:id="@+id/offBattery"
                 style="@style/valueStyle" />
             <TextView
@@ -195,7 +195,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
             </CheckBox>
-            <mg.charge.MySwitch
+            <mg.charge.view.MySwitch
                 android:id="@+id/directSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

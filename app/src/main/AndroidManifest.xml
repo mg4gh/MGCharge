@@ -15,7 +15,7 @@
         android:theme="@style/Theme.MGCharge"
         >
         <activity
-            android:name=".MGChargeActivity"
+            android:name="mg.charge.view.MGChargeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask">
@@ -25,18 +25,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DeviceActivity"
+            android:name="mg.charge.view.DeviceActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="Devices +++"
-            android:parentActivityName=".MGChargeActivity"
+            android:parentActivityName="mg.charge.view.MGChargeActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustPan"
             />
-
-        <service
-            android:name="mg.charge.SupervisionService"
-            android:exported="false"
-            android:foregroundServiceType="connectedDevice" />
 
 
     </application>

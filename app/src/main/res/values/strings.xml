@@ -31,7 +31,8 @@
     <string name="devices_devices">Devices</string>
     <string name="level_dialog_ok">OK</string>
     <string name="level_dialog_abort">ABORT</string>
-    <string name="app_version">Version 0.1</string>
+    <string name="app_version">Version 0.2</string>
+    <string name="unique_work_name">MGCharge_unique_work_name_01234</string>
 
     <string-array name="rangeSliderValues" >
     <item>20</item>
