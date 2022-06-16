@@ -50,6 +50,7 @@ public class DeviceWorker extends Worker {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra("EXIT", true);
                 intent.putExtra("ACTIVITY_COUNT", application.activityCount);
+                preferences.edit().putBoolean("EXIT", true).apply();
                 getApplicationContext().startActivity(intent);
             } else {
                 OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(DeviceWorker.class)

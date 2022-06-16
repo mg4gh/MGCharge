@@ -174,6 +174,7 @@ public class MGChargeActivity extends AppCompatActivity implements Observer {
         if (activityCount != 1){
             finishAndRemoveTask();
             Log.i(MGChargeApplication.TAG, NameUtil.context());
+            preferences.edit().putBoolean("EXIT", false).commit();
             System.exit(0);
         }
     }
