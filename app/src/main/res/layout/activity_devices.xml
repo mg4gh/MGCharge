@@ -136,15 +136,15 @@
                 android:layout_marginEnd="5dp"
                 />
 
-            <TextView
+            <Button
                 android:id="@+id/editOk"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:text="@string/devices_ok"
-                android:background="@color/lightgray"
-                android:padding="8dp"
-                android:layout_margin="5dp"
+
+                android:padding="1dp"
+                android:layout_margin="1dp"
                 />
         </LinearLayout>
 
@@ -177,23 +177,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <TextView
+        <Button
             android:id="@+id/new_device"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/devices_new_device"
             android:textSize="16sp"
-            android:background="@color/lightgray"
+
             android:layout_margin="10dp"
             android:padding="10dp"
             />
-        <TextView
+        <Button
             android:id="@+id/delete_device"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/devices_delete_device"
             android:textSize="16sp"
-            android:background="@color/lightgray"
+
             android:layout_margin="10dp"
             android:padding="10dp"
             />

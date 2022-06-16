@@ -26,8 +26,8 @@
     <string name="devices_username">Username</string>
     <string name="devices_password">Password</string>
     <string name="devices_ok">OK</string>
-    <string name="devices_new_device">… new Device</string>
-    <string name="devices_delete_device">… delete Device</string>
+    <string name="devices_new_device">new Device</string>
+    <string name="devices_delete_device">delete Device</string>
     <string name="devices_devices">Devices</string>
     <string name="level_dialog_ok">OK</string>
     <string name="level_dialog_abort">ABORT</string>
