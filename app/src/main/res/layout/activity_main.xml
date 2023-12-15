@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".view.MGChargeActivity"
@@ -10,25 +11,27 @@
         android:id="@+id/device"
         android:layout_width="match_parent"
         android:layout_height="70dp"
-        android:textSize="48sp"
-        android:layout_marginTop="20dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="20dp"
         android:text="@string/device_name"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textSize="48sp"
+        tools:ignore="TextSizeCheck" />
 
     <TextView
-        android:id="@+id/connected"
+        android:id="@+id/state"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:textSize="16sp"
-        android:layout_marginTop="5dp"
         android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="5dp"
         android:text="@string/unconnected"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textSize="16sp"
+        tools:ignore="TextSizeCheck" />
 
 
     <LinearLayout
@@ -49,22 +52,25 @@
                 style="@style/headStyle">
             </TextView>
 
-            <RadioGroup
+            <mg.charge.view.MyRadioGroup
+                android:id="@+id/on"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <RadioButton
                     android:id="@+id/on1"
-                    android:text="@string/based_on_battery_percent"
                     style="@style/rbStyle"
                     android:enabled="false"
-                    />
+                    android:text="@string/based_on_battery_percent"
+                    tools:ignore="DuplicateSpeakableTextCheck" />
+
                 <RadioButton
                     android:id="@+id/on2"
-                    android:text="@string/based_on_time"
                     style="@style/rbStyle"
                     android:enabled="false"
-                    />
-            </RadioGroup>
+                    android:text="@string/based_on_time"
+                    tools:ignore="DuplicateSpeakableTextCheck" />
+            </mg.charge.view.MyRadioGroup>
         </LinearLayout>
 
         <LinearLayout
@@ -74,18 +80,17 @@
             android:layout_weight="30"
             android:layout_margin="10dp">
 
-            <CheckBox
+            <mg.charge.view.MyCheck
                 android:id="@+id/onCheck"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </CheckBox>
+                android:layout_height="wrap_content"
+                tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
             <mg.charge.view.BatteryTextView
                 android:id="@+id/onBattery"
                 style="@style/valueStyle" />
             <TextView
                 android:id="@+id/onTime"
                 style="@style/valueStyle"
-                android:text="@string/default_on_time"
                 />
         </LinearLayout>
     </LinearLayout>
@@ -108,7 +113,8 @@
                 style="@style/headStyle">
             </TextView>
 
-            <RadioGroup
+            <mg.charge.view.MyRadioGroup
+                android:id="@+id/off"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <RadioButton
@@ -123,7 +129,7 @@
                     style="@style/rbStyle"
                     android:enabled="false"
                     />
-            </RadioGroup>
+            </mg.charge.view.MyRadioGroup>
         </LinearLayout>
 
         <LinearLayout
@@ -133,18 +139,17 @@
             android:layout_weight="30"
             android:layout_margin="10dp">
 
-            <CheckBox
+            <mg.charge.view.MyCheck
                 android:id="@+id/offCheck"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </CheckBox>
+                android:layout_height="wrap_content"
+                tools:ignore="TouchTargetSizeCheck" />
             <mg.charge.view.BatteryTextView
                 android:id="@+id/offBattery"
                 style="@style/valueStyle" />
             <TextView
                 android:id="@+id/offTime"
                 style="@style/valueStyle"
-                android:text="@string/default_off_time"
                 />
         </LinearLayout>
     </LinearLayout>
@@ -169,15 +174,27 @@
                 style="@style/headStyle">
             </TextView>
             <TextView
-                android:id="@+id/directDescription"
+                android:id="@+id/targetStateDescription"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:textSize="18sp"
-                android:layout_marginTop="9dp"
+                android:layout_marginTop="25dp"
                 android:layout_marginStart="29dp"
-                android:layout_marginBottom="9dp"
-                android:layout_marginEnd="9dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginEnd="10dp"
                 android:text="@string/switch_directly_on_off"
+                android:enabled="false"
+                />
+            <TextView
+                android:id="@+id/isActiveDescription"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:textSize="18sp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="29dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginEnd="9dp"
+                android:text="@string/switch_active_on_off"
                 android:enabled="false"
                 />
 
@@ -190,18 +207,33 @@
             android:layout_weight="30"
             android:layout_margin="10dp">
 
-            <CheckBox
+            <mg.charge.view.MyCheck
                 android:id="@+id/directCheck"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-            </CheckBox>
+                android:layout_height="wrap_content"
+                tools:ignore="TouchTargetSizeCheck" />
+
             <mg.charge.view.MySwitch
-                android:id="@+id/directSwitch"
+                android:id="@+id/targetState"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="14dp"
+                android:layout_marginBottom="8dp"
                 android:enabled="false"
-                />
+                android:text=""
+                tools:ignore="SpeakableTextPresentCheck" />
+            <mg.charge.view.MySwitch
+                android:id="@+id/isActive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="9dp"
+                android:enabled="false"
+                android:text=""
+                tools:ignore="SpeakableTextPresentCheck" />
+
 
         </LinearLayout>
 

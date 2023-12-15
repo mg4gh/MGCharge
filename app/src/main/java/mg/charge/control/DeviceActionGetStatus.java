@@ -51,28 +51,28 @@ public class DeviceActionGetStatus extends DeviceAction{
                     Request request = requestBuilder.build();
 
                     Call call = client.newCall(request);
-                    Response response = call.execute();
-                    Log.d(MGChargeApplication.TAG, NameUtil.context() + " response=" + response);
+                    try (Response response = call.execute()){
+                        Log.d(MGChargeApplication.TAG, NameUtil.context() + " response=" + response);
 
-                    if (response.code() == 200) {
-                        ResponseBody responseBody = response.body();
-                        if (responseBody != null) {
-                            String answer = responseBody.string();
-                            Log.d(MGChargeApplication.TAG, NameUtil.context() + " body=" + answer);
+                        if (response.code() == 200) {
+                            ResponseBody responseBody = response.body();
+                            if (responseBody != null) {
+                                String answer = responseBody.string();
+                                Log.d(MGChargeApplication.TAG, NameUtil.context() + " body=" + answer);
 
-//                    setConnected(true);
-                            deviceStatus.setConnected(true);
-                            String[] part = answer.split("\"ison\":");
-                            deviceStatus.setOn((part.length == 2) && (part[1].startsWith("true")));
+                                deviceStatus.setConnected(true);
+                                String[] part = answer.split("\"ison\":");
+                                deviceStatus.setOn((part.length == 2) && (part[1].startsWith("true")));
 
-                            try {
-                                String power = answer.replaceAll(".*\"power\":", "").replaceFirst(",.*", "");
-                                deviceStatus.setPower(Float.parseFloat(power));
-                            } catch (NumberFormatException e) {
-                                Log.d(MGChargeApplication.TAG, NameUtil.context() + " no power value detected");
+                                try {
+                                    String power = answer.replaceAll(".*\"power\":", "").replaceFirst(",.*", "");
+                                    deviceStatus.setPower(Float.parseFloat(power));
+                                } catch (NumberFormatException e) {
+                                    Log.d(MGChargeApplication.TAG, NameUtil.context() + " no power value detected");
+                                }
                             }
-                        }
 
+                        }
                     }
                     break;
                 } catch (Throwable e) {

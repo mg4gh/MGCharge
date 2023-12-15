@@ -50,18 +50,17 @@ public class DeviceActionTurn extends DeviceAction{
             Request request = requestBuilder.build();
 
             Call call = client.newCall(request);
-            Response response = call.execute();
-            Log.d(MGChargeApplication.TAG, NameUtil.context()+ " url="+url+" rc="+response.code());
-
-
-            if (response.code() == 200){
-                ResponseBody responseBody = response.body();
-                if (responseBody != null){
-                    Log.d(MGChargeApplication.TAG, NameUtil.context()+" response="+response);
-                    try {
-                        String answer = responseBody.string();
-                        Log.d(MGChargeApplication.TAG, NameUtil.context()+" body="+answer);
-                    } catch (Exception e){}
+            try (Response response = call.execute()){
+                Log.d(MGChargeApplication.TAG, NameUtil.context()+ " url="+url+" rc="+response.code());
+                if (response.code() == 200){
+                    ResponseBody responseBody = response.body();
+                    if (responseBody != null){
+                        Log.d(MGChargeApplication.TAG, NameUtil.context()+" response="+response);
+                        try {
+                            String answer = responseBody.string();
+                            Log.d(MGChargeApplication.TAG, NameUtil.context()+" body="+answer);
+                        } catch (Exception e){ Log.e(MGChargeApplication.TAG, e.getMessage(),e); }
+                    }
                 }
             }
         } catch (Throwable e) {

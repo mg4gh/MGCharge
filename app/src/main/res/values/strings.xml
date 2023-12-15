@@ -20,6 +20,7 @@
     <string name="default_on_time">05:00</string>
     <string name="default_off_time">08:00</string>
     <string name="switch_directly_on_off">Switch directly on/off</string>
+    <string name="switch_active_on_off">Switch active on/off</string>
     <string name="devices_device_id">Device Id</string>
     <string name="devices_device_name">Device name</string>
     <string name="devices_ip_address">IP address</string>
@@ -31,7 +32,7 @@
     <string name="devices_devices">Devices</string>
     <string name="level_dialog_ok">OK</string>
     <string name="level_dialog_abort">ABORT</string>
-    <string name="app_version">Version 0.2</string>
+    <string name="app_version">Version 0.3</string>
     <string name="unique_work_name">MGCharge_unique_work_name_01234</string>
 
     <string-array name="rangeSliderValues" >

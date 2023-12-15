@@ -1,11 +1,12 @@
 package mg.charge.model;
 
+import androidx.annotation.NonNull;
+
 public class DeviceStatus {
 
     boolean connected = false;
     boolean on = false;
     float power = 0;
-    long lastRefresh = 0;
 
     public boolean isConnected() {
         return connected;
@@ -37,14 +38,7 @@ public class DeviceStatus {
         power = 0;
     }
 
-    public long getLastRefresh() {
-        return lastRefresh;
-    }
-
-    public void setLastRefresh(long lastRefresh) {
-        this.lastRefresh = lastRefresh;
-    }
-
+    @NonNull
     @Override
     public String toString() {
         return "DeviceStatus{" +

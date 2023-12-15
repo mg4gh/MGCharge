@@ -2,8 +2,8 @@ package mg.charge;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import androidx.work.ExistingWorkPolicy;
@@ -21,11 +21,8 @@ import mg.charge.view.MGChargeActivity;
 
 public class DeviceWorker extends Worker {
 
-    SharedPreferences preferences;
-
     public DeviceWorker(Context context, WorkerParameters workerParams) {
         super(context, workerParams);
-        preferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     @androidx.annotation.NonNull
@@ -36,27 +33,33 @@ public class DeviceWorker extends Worker {
             MGChargeApplication application = (MGChargeApplication) getApplicationContext();
 
             DeviceStatus deviceStatus = new DeviceActionGetStatus(application.getSelectedDevice()).execute();
-            boolean shouldBeOn = application.getTargetState(deviceStatus.isOn(), System.currentTimeMillis());
-            boolean exit = false;
+            long[] retriggerTime = new long[]{1000};
+            boolean shouldBeOn = application.getTargetState(deviceStatus.isOn(), System.currentTimeMillis(), retriggerTime);
+            boolean inactive = false;
             if (shouldBeOn != deviceStatus.isOn()){
                 new DeviceActionTurn(application.getSelectedDevice(), shouldBeOn).execute();
                 deviceStatus = new DeviceActionGetStatus(application.getSelectedDevice()).execute();
-                exit = !shouldBeOn;
+                inactive = !shouldBeOn;
             }
             application.setDeviceStatus(deviceStatus);
-            if (exit){
-                Log.i(MGChargeApplication.TAG, NameUtil.context()+" trigger MGChargeActivity to exit");
-                Intent intent = new Intent(getApplicationContext(), MGChargeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("EXIT", true);
-                intent.putExtra("ACTIVITY_COUNT", application.activityCount);
-                preferences.edit().putBoolean("EXIT", true).apply();
-                getApplicationContext().startActivity(intent);
+            if (inactive){
+                application.setActive(false);
+                if (application.activityCount == 0){
+                    Log.i(MGChargeApplication.TAG, NameUtil.context()+" trigger MGChargeApplication to exit");
+                    Intent intent = new Intent(getApplicationContext(), MGChargeActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra("EXIT", true);
+                    intent.putExtra("ACTIVITY_COUNT", application.activityCount);
+                    getApplicationContext().startActivity(intent);
+                    new Handler(Looper.getMainLooper()).postDelayed(()->System.exit(0),2*1000);
+                }
             } else {
+                long retrigger = (retriggerTime[0]<0)?60:Math.max(1,Math.min(retriggerTime[0], 60));
+                Log.i(MGChargeApplication.TAG, NameUtil.context()+" retrigger in "+retrigger);
                 OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(DeviceWorker.class)
-                        .setInitialDelay(60, TimeUnit.SECONDS).build();
+                        .setInitialDelay(retrigger, TimeUnit.SECONDS).build();
                 String uniqueWokName = getApplicationContext().getString(R.string.unique_work_name);
-                WorkManager.getInstance().enqueueUniqueWork(uniqueWokName, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
+                WorkManager.getInstance(application).enqueueUniqueWork(uniqueWokName, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
             }
 
         } catch (Exception e) {
@@ -65,7 +68,4 @@ public class DeviceWorker extends Worker {
         return Result.success();
     }
 
-
-
-
-};
+}

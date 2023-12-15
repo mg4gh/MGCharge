@@ -26,14 +26,6 @@ public class Device {
     public Device(){
     }
 
-    public Device(String id, String name, String ip, String username, String password){
-        this.id = id;
-        this.name = name;
-        this.ip = ip;
-        this.username = username;
-        this.password = password;
-    }
-
     public String getId() {
         return id;
     }

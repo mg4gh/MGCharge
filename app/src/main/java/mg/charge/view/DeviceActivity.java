@@ -97,13 +97,13 @@ public class DeviceActivity extends AppCompatActivity {
         if (mgChargeApplication.getSelectedDevice() != null){
             startEditDevice(mgChargeApplication.getSelectedDevice());
         }
-        mgChargeApplication.actvityCountUpdate(true);
+        mgChargeApplication.activityCountUpdate(true);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mgChargeApplication.actvityCountUpdate(false);
+        mgChargeApplication.activityCountUpdate(false);
     }
 
     public void startEditDevice(Device editDevice){

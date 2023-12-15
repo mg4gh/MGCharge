@@ -10,44 +10,33 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import java.util.Locale;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.UUID;
 
 import mg.charge.MGChargeApplication;
 import mg.charge.NameUtil;
 import mg.charge.R;
-import mg.charge.control.DeviceActionGetStatus;
-import mg.charge.control.DeviceActionTurn;
 import mg.charge.model.DeviceStatus;
+import mg.charge.util.IdUtil;
 
-public class MGChargeActivity extends AppCompatActivity implements Observer {
+public class MGChargeActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     MGChargeApplication mgChargeApplication;
     SharedPreferences preferences;
+    IdUtil idUtil;
     Handler timer;
 
     Runnable ttRefreshDeviceData = new Runnable() {
         @Override
         public void run() {
-            new Thread(){
-                @Override
-                public void run() {
-                    DeviceStatus deviceStatus = new DeviceActionGetStatus(mgChargeApplication.getSelectedDevice()).execute();
-                    mgChargeApplication.setDeviceStatus(deviceStatus);
-                    mgChargeApplication.checkWorker();
-                }
-            }.start();
+            preferences.edit().putString(idUtil.getIdString(R.id.main), UUID.randomUUID().toString()).apply(); // used for refresh request
             timer.postDelayed(ttRefreshDeviceData, 5000);
         }
     };
@@ -58,74 +47,33 @@ public class MGChargeActivity extends AppCompatActivity implements Observer {
         setContentView(R.layout.activity_main);
         Log.i(MGChargeApplication.TAG, NameUtil.context());
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-
         mgChargeApplication = (MGChargeApplication) getApplication();
+        preferences = mgChargeApplication.getPreferences();
+        idUtil = mgChargeApplication.getIdUtil();
         timer = new Handler();
 
         if (getSupportActionBar() != null){
             getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
         }
-
-        CheckBox direct = findViewById(R.id.directCheck);
-        direct.setOnClickListener(view -> setEnabledDependencies(direct, findViewById(R.id.directSwitch), findViewById(R.id.directDescription)));
-
-        ((SwitchCompat)findViewById(R.id.directSwitch)).setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            if (compoundButton.isPressed()){
-                Log.i("TAG", NameUtil.context()+" set isChecked="+isChecked);
-            }
-        });
-
-
-        ((CheckBox)findViewById(R.id.onCheck)).setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            preferences.edit().putBoolean("onCheck", isChecked).apply();
-            mgChargeApplication.setActive( isChecked || ((CheckBox)findViewById(R.id.offCheck)).isChecked() );
-            setOnGroup();
-        });
-        ((CheckBox)findViewById(R.id.offCheck)).setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            preferences.edit().putBoolean("offCheck", isChecked).apply();
-            mgChargeApplication.setActive( isChecked || ((CheckBox)findViewById(R.id.onCheck)).isChecked() );
-            setOffGroup();
-        });
-        ((CheckBox)findViewById(R.id.directCheck)).setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            Log.i(MGChargeApplication.TAG, "CB: directCheck="+isChecked);
-            preferences.edit().putBoolean("directCheck", isChecked).apply();
-            setDirectGroup();
-        });
-
-        ((RadioButton)findViewById(R.id.on1)).setOnCheckedChangeListener((compoundButton, isChecked) -> preferences.edit().putBoolean("on1", isChecked).commit() );
-        ((RadioButton)findViewById(R.id.on2)).setOnCheckedChangeListener((compoundButton, isChecked) -> preferences.edit().putBoolean("on2", isChecked).commit() );
-        ((RadioButton)findViewById(R.id.off1)).setOnCheckedChangeListener((compoundButton, isChecked) -> preferences.edit().putBoolean("off1", isChecked).commit() );
-        ((RadioButton)findViewById(R.id.off2)).setOnCheckedChangeListener((compoundButton, isChecked) -> preferences.edit().putBoolean("off2", isChecked).commit() );
-
-        createTimeOCL(findViewById(R.id.onTime), "onTime");
-        createTimeOCL(findViewById(R.id.offTime), "offTime");
-
-        BatteryTextView btwOn = findViewById(R.id.onBattery);
-        BatteryTextView btwOff = findViewById(R.id.offBattery);
-        btwOn.setPrefName("onBattery", 20);
-        btwOff.setPrefName("offBattery", 85);
-        btwOn.setOnClickListener(view -> new BatteryLevelDialog(btwOn, btwOff, true).show());
-        btwOff.setOnClickListener(view -> new BatteryLevelDialog(btwOn, btwOff, false).show());
+        createTimeOCL(findViewById(R.id.onTime), idUtil.getIdString(R.id.onTime));
+        createTimeOCL(findViewById(R.id.offTime), idUtil.getIdString(R.id.offTime));
+        findViewById(R.id.onBattery).setOnClickListener(view -> new BatteryLevelDialog(this, R.id.onBattery,R.id.offBattery, true).show());
+        findViewById(R.id.offBattery).setOnClickListener(view -> new BatteryLevelDialog(this, R.id.onBattery,R.id.offBattery, false).show());
     }
     private void createTimeOCL(TextView textView, String prefName){
         textView.setOnClickListener(v -> {
             String[] time = textView.getText().toString().split(":");
             TimePickerDialog mTimePicker;
-            TimePickerDialog.OnTimeSetListener otsl = new TimePickerDialog.OnTimeSetListener() {
-                @Override
-                public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                    String sSelectedTime = String.format(Locale.ENGLISH, "%02d:%02d", selectedHour, selectedMinute);
-                    preferences.edit().putString(prefName, sSelectedTime).apply();
-                    textView.setText(sSelectedTime);
-                }
+            TimePickerDialog.OnTimeSetListener otsl = (timePicker, selectedHour, selectedMinute) -> {
+                String sSelectedTime = String.format(Locale.ENGLISH, "%02d:%02d", selectedHour, selectedMinute);
+                preferences.edit().putString(prefName, sSelectedTime).apply();
+                textView.setText(sSelectedTime);
             };
             mTimePicker = new TimePickerDialog(MGChargeActivity.this, otsl, Integer.parseInt(time[0]), Integer.parseInt(time[1]),true);
             mTimePicker.setTitle("Select Time");
             mTimePicker.show();
         });
     }
-
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -163,6 +111,7 @@ public class MGChargeActivity extends AppCompatActivity implements Observer {
             alertDialog.show();
         }
         if (item.getItemId() == R.id.menu_exit){
+            Log.i(MGChargeApplication.TAG, NameUtil.context()+" menu item exit pressed ... leaving application");
             exitApplication(0);
         }
         return res;
@@ -170,11 +119,9 @@ public class MGChargeActivity extends AppCompatActivity implements Observer {
 
     void exitApplication(int activityCount){
         Log.i(MGChargeApplication.TAG, NameUtil.context());
-        mgChargeApplication.setActive(false);
         if (activityCount != 1){
             finishAndRemoveTask();
             Log.i(MGChargeApplication.TAG, NameUtil.context());
-            preferences.edit().putBoolean("EXIT", false).commit();
             System.exit(0);
         }
     }
@@ -189,9 +136,8 @@ public class MGChargeActivity extends AppCompatActivity implements Observer {
         super.onResume();
         Log.i(MGChargeApplication.TAG, NameUtil.context());
         timer.postDelayed(ttRefreshDeviceData, 10);
-//        mgChargeApplication.setActive(true);
-        mgChargeApplication.getAppObservable().addObserver(this);
-        mgChargeApplication.actvityCountUpdate(true);
+        preferences.registerOnSharedPreferenceChangeListener(this);
+        mgChargeApplication.activityCountUpdate(true);
         setHead();
     }
 
@@ -199,10 +145,9 @@ public class MGChargeActivity extends AppCompatActivity implements Observer {
     protected void onPause() {
         super.onPause();
         Log.i(MGChargeApplication.TAG, NameUtil.context());
-        mgChargeApplication.getAppObservable().deleteObserver(this);
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
         timer.removeCallbacks(ttRefreshDeviceData);
-//        mgChargeApplication.setMgChargeActivityRunning(false);
-        mgChargeApplication.actvityCountUpdate(false);
+        mgChargeApplication.activityCountUpdate(false);
     }
 
     @Override
@@ -217,53 +162,44 @@ public class MGChargeActivity extends AppCompatActivity implements Observer {
             String text;
             DeviceStatus deviceStatus = mgChargeApplication.getDeviceStatus();
             if (deviceStatus.isConnected() ){
-                text = getResources().getString(R.string.connected) + String.format(Locale.ENGLISH," - %s - %.1fW",deviceStatus.isOn()?"on":"off",deviceStatus.getPower());
+                text = getResources().getString(R.string.connected) + String.format(Locale.ENGLISH," - %s - %s - %.1fW",
+                        mgChargeApplication.isActive()?"active":"inactive",
+                        deviceStatus.isOn()?"on":"off",
+                        deviceStatus.getPower());
             } else {
                 text = getResources().getString(R.string.unconnected);
             }
-            ((TextView)findViewById(R.id.connected)).setText(text);
+            ((TextView)findViewById(R.id.state)).setText(text);
         } else {
             ((TextView)findViewById(R.id.device)).setText(getResources().getString(R.string.app_name));
         }
 
     }
     private void setOnGroup(){
-        ((CheckBox)findViewById(R.id.onCheck)).setChecked(preferences.getBoolean("onCheck", false));
         setEnabledDependencies(findViewById(R.id.onCheck), findViewById(R.id.on1), findViewById(R.id.onBattery), findViewById(R.id.on2), findViewById(R.id.onTime));
-        ((RadioButton)findViewById(R.id.on1)).setChecked(preferences.getBoolean("on1", true));
-        ((BatteryTextView)findViewById(R.id.onBattery)).refresh();
-        ((RadioButton)findViewById(R.id.on2)).setChecked(preferences.getBoolean("on2", false));
-        ((TextView)findViewById(R.id.onTime)).setText(preferences.getString("onTime", "05:00"));
+        ((MyRadioGroup)findViewById(R.id.on)).check(idUtil.getId( preferences.getString(idUtil.getIdString(R.id.on), idUtil.getIdString(R.id.on2)) ));
+        ((BatteryTextView)findViewById(R.id.onBattery)).refresh(20);
+        ((TextView)findViewById(R.id.onTime)).setText(preferences.getString(idUtil.getIdString(R.id.onTime), "06:00"));
     }
 
     private void setOffGroup(){
         setEnabledDependencies(findViewById(R.id.offCheck), findViewById(R.id.off1), findViewById(R.id.offBattery), findViewById(R.id.off2), findViewById(R.id.offTime));
-        ((CheckBox)findViewById(R.id.offCheck)).setChecked(preferences.getBoolean("offCheck", false));
-        ((RadioButton)findViewById(R.id.off1)).setChecked(preferences.getBoolean("off1", true));
-        ((BatteryTextView)findViewById(R.id.offBattery)).refresh();
-        ((RadioButton)findViewById(R.id.off2)).setChecked(preferences.getBoolean("off2", false));
-        ((TextView)findViewById(R.id.offTime)).setText(preferences.getString("offTime", "08:00"));
+        ((MyRadioGroup)findViewById(R.id.off)).check(idUtil.getId( preferences.getString(idUtil.getIdString(R.id.off), idUtil.getIdString(R.id.off1)) ));
+        ((BatteryTextView)findViewById(R.id.offBattery)).refresh(85);
+        ((TextView)findViewById(R.id.offTime)).setText(preferences.getString(idUtil.getIdString(R.id.offTime), "08:00"));
     }
 
-    private void setDirectHeadGroup(){
-        DeviceStatus deviceStatus = mgChargeApplication.getDeviceStatus();
-        ((CheckBox)findViewById(R.id.directCheck)).setChecked(preferences.getBoolean("directCheck", false));
-        setEnabledDependencies(deviceStatus.isConnected(), findViewById(R.id.directHead), findViewById(R.id.directCheck), findViewById(R.id.directDescription), findViewById(R.id.directSwitch) );
-        findViewById(R.id.directCheck).setEnabled(deviceStatus.isConnected());
-        findViewById(R.id.directHead).setEnabled(deviceStatus.isConnected());
-        if (deviceStatus.isConnected()){
-            ((SwitchCompat)findViewById(R.id.directSwitch)).setChecked(deviceStatus.isOn());
-        }
-    }
 
     private void setDirectGroup(){
         DeviceStatus deviceStatus = mgChargeApplication.getDeviceStatus();
 
-        setEnabledDependencies(findViewById(R.id.directCheck), findViewById(R.id.directSwitch), findViewById(R.id.directDescription));
+        setEnabledDependencies(((CheckBox)findViewById(R.id.directCheck)).isChecked() && deviceStatus.isConnected(), findViewById(R.id.targetState), findViewById(R.id.targetStateDescription),
+                findViewById(R.id.isActive), findViewById(R.id.isActiveDescription));
         Log.i(MGChargeApplication.TAG, NameUtil.context()+ " mgChargeApplication.isOn="+deviceStatus.isOn());
-        if (deviceStatus.isConnected()){
-            ((SwitchCompat)findViewById(R.id.directSwitch)).setChecked(deviceStatus.isOn());
-        }
+
+        ((SwitchCompat)findViewById(R.id.targetState)).setChecked(preferences.getBoolean(idUtil.getIdString(R.id.targetState), false));
+        ((SwitchCompat)findViewById(R.id.isActive)).setChecked(preferences.getBoolean(idUtil.getIdString(R.id.isActive), true));
+
     }
 
 
@@ -277,29 +213,30 @@ public class MGChargeActivity extends AppCompatActivity implements Observer {
         }
     }
 
-    public void setDirectSwitch(boolean setChecked){
-        Log.i(MGChargeApplication.TAG, NameUtil.context()+" setChecked="+ setChecked);
-        if (mgChargeApplication.getDeviceStatus().isOn() != setChecked){
-            new Thread(){
-                @Override
-                public void run() {
-                    new DeviceActionTurn(mgChargeApplication.getSelectedDevice(), setChecked).execute();
-                    DeviceStatus deviceStatus = new DeviceActionGetStatus(mgChargeApplication.getSelectedDevice()).execute();
-                    mgChargeApplication.setDeviceStatus(deviceStatus);
-                }
-            }.start();
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (idUtil.getIdString(R.id.isActive).equals(key)
+                || idUtil.getIdString(R.id.directCheck).equals(key)
+                || idUtil.getIdString(R.id.on).equals(key)
+                || idUtil.getIdString(R.id.onCheck).equals(key)
+                || idUtil.getIdString(R.id.off).equals(key)
+                || idUtil.getIdString(R.id.offCheck).equals(key)
+                || idUtil.getIdString(R.id.targetState).equals(key)
+                || idUtil.getIdString(R.id.state).equals(key)
+                || idUtil.getIdString(R.id.onTime).equals(key)
+                || idUtil.getIdString(R.id.offTime).equals(key)
+                || idUtil.getIdString(R.id.onBattery).equals(key)
+                || idUtil.getIdString(R.id.offBattery).equals(key)
+        ){
+            runOnUiThread(() -> {
+                Log.i(MGChargeApplication.TAG, NameUtil.context()+" update UI of MGChargeActivity!");
+                setHead();
+                setOnGroup();
+                setOffGroup();
+                setDirectGroup();
+            });
         }
     }
 
-    @Override
-    public void update(Observable observable, Object o) {
-        runOnUiThread(() -> {
-            Log.i(MGChargeApplication.TAG, NameUtil.context()+" update MGChargeActivity!");
-            setHead();
-            setDirectHeadGroup();
-            setDirectGroup();
-            setOnGroup();
-            setOffGroup();
-        });
-    }
 }
